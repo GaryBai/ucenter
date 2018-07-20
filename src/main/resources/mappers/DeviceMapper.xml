@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wayplay.ucenter.dao.DeviceDao">
+
+	<select id="deviceIsActivate" parameterType="java.lang.String"
+		resultType="int">
+		SELECT
+			count(*)
+		FROM
+			tbl_wp_device d
+		WHERE
+			d.de_imei = #{imei}
+	</select>
+	
+	<select id="findDeviceByImei" parameterType="java.lang.String"
+		resultType="com.wayplay.ucenter.model.Device">
+		SELECT
+			d.de_did did,
+			d.de_busid busid,
+			d.de_init_version initversion,
+			d.de_cur_version curversion,
+			d.de_activatetime activatetime,
+			d.de_latesttime latesttime
+		FROM
+			tbl_wp_device d
+		WHERE
+			d.de_imei = #{imei}
+	</select>
+
+	<insert id="activate" parameterType="com.wayplay.ucenter.model.Device">
+		INSERT INTO tbl_wp_device(
+			de_imei,
+			de_imsi,
+			de_init_version,
+			de_cur_version,
+			de_activatetime,
+			de_latesttime
+		)
+		VALUES
+			(#{imei}, #{imsi}, #{initversion}, #{curversion}, now(), now())
+	</insert>
+	
+	<update id="deviceUpdate" parameterType="com.wayplay.ucenter.model.Device">
+		UPDATE tbl_wp_device d
+		SET d.de_latesttime = now(),
+			d.de_cur_version = #{curversion}
+		WHERE
+			d.de_imei = #{imei}
+	</update>
+	
+	<select id="findCoinByDid" parameterType="java.lang.Long" resultType="Integer">
+		SELECT
+			d.de_cur_coin curcoin
+		FROM
+			tbl_wp_device d
+		WHERE
+			d.de_did = #{did}
+	</select>
+
+	<update id="updateCoinByDid" parameterType="java.util.HashMap">
+		INSERT INTO tbl_wp_device (de_did, de_cur_coin)
+		VALUES
+			(#{did}, #{amount}) ON DUPLICATE KEY UPDATE de_did = #{did},
+			de_cur_coin = #{amount}
+	</update>
+
+</mapper>

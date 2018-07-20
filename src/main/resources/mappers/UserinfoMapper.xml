@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wayplay.ucenter.dao.UserinfoDao">
+
+	<!-- <resultMap id="userMap" type="com.wayplay.ucenter.model.Userinfo"> 
+		<id property="userId" column="id" /> <result property="nickName" column="nickname" 
+		/> <result property="iconUrl" column="icon_url" /> </resultMap> -->
+
+	<select id="findUserinfoByUid" parameterType="java.lang.Long"
+		resultType="com.wayplay.ucenter.model.Userinfo">
+		SELECT 
+			ui_uid uid,
+			ui_openid openid,
+			ui_username username
+		FROM 
+			tbl_wp_userinfo
+		WHERE 
+			ui_uid = #{uid}
+	</select>
+	
+	<select id="findUserinfoByOpenid" parameterType="java.lang.String"
+		resultType="com.wayplay.ucenter.model.Userinfo">
+		SELECT 
+			ui_uid uid,
+			ui_openid openid,
+			ui_username username,
+			ui_registertime registertime,
+			ui_latesttime latesttime
+		FROM 
+			tbl_wp_userinfo
+		WHERE 
+			ui_openid = #{openid}
+	</select>
+
+	<select id="userIsRegister" parameterType="java.lang.String"
+		resultType="int">
+		SELECT
+			count(*)
+		FROM
+			tbl_wp_userinfo u
+		WHERE
+			u.ui_openid = #{openid}
+	</select>
+
+	<insert id="register" parameterType="com.wayplay.ucenter.model.Userinfo">
+		INSERT INTO tbl_wp_userinfo(
+			ui_openid,
+			ui_username,
+			ui_iconurl,
+			ui_registertime,
+			ui_latesttime,
+			ui_init_did,
+			ui_cur_did
+		)
+		VALUES
+			(#{openid}, #{username}, #{iconurl}, now(), now(), #{initdid}, #{curdid})
+	</insert>
+	
+	<update id="userUpdate" parameterType="com.wayplay.ucenter.model.Userinfo">
+		UPDATE tbl_wp_userinfo u
+		SET u.ui_latesttime = now(),
+			u.ui_cur_did = #{curdid}
+		WHERE
+			u.ui_openid = #{openid}
+	</update>
+
+
+</mapper>
